@@ -145,3 +145,56 @@ exports.updateProduct = (req, res) => {
         })
     })
 }
+
+// product listing
+
+exports.getAllProducts = (req, res) => {
+    let limit = req.query.limit ? parseInt(req.query.limit) : 8
+    let sortBy = req.query.sortBy ? req.query.sortBy : "_id"
+    Product.find()
+    .select("-photo")
+    .populate("category")
+    .sort([[sortBy, "asc"]])
+    .limit(limit)
+    .exec((error, products) => {
+        return res.status(400).json({
+            error: "no product found"
+        })
+    })
+}
+
+
+exports.updateStock = (req, res, next) => {
+    let operations = req.body.order.products.map(prod => {
+        return {
+            updateOne: {
+                filter: {_id: prod._id},
+                update: {$inc: {
+                    stock: -prod.count, sold: +prod.count
+                }}
+            }
+        }
+    })
+    Product.bulkWrite(operations, {}, (error, products) => {
+        if(error){
+            return res.status(400).json({
+                error: "Bulk operation failed."
+            })
+        }
+        next()
+    } )
+}
+
+
+// listing category
+
+exports.getAllUniqueCategories = (req, res) => {
+    Product.distinct('category', {}, (error, getcategory) => {
+        if(err){
+            return res.status(400).json({
+                error: "No category found"
+            })
+        }
+        res.json(category)
+    })
+}
