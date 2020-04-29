@@ -1,8 +1,9 @@
-*, html, body{
-    padding: 0;
-    margin: 0;
+.btn,
+.jumbotron,
+.nav :hover {
+  border-radius: 0px;
 }
 
-body{
-    background-color: #343a40;
+body {
+  background: #343a40;
 }
